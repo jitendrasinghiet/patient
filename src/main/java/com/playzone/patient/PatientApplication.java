@@ -11,7 +11,7 @@ import com.playzone.medicine.remote.MedicineOperations;
 
 import feign.Feign;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = { "com.playzone" })
 @EnableEurekaClient
 @EnableFeignClients(basePackageClasses = {MedicineOperations.class,Medicine.class})
 public class PatientApplication {

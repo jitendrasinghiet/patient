@@ -1,10 +1,13 @@
 package com.playzone.patient.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -17,6 +20,8 @@ import com.playzone.patient.search.SpecificationBuilder;
 
 @Service
 public class PatientServiceImpl implements PatientService{
+	
+	Logger log = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
 	private PatientRepository patientRepository;
@@ -59,9 +64,19 @@ public class PatientServiceImpl implements PatientService{
         while (matcher.find()) {
             builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
         }
-        
+       
         Specification<Patient> spec = builder.build();
-        return patientRepository.findAll(spec);
+        List<Patient> patients = new ArrayList<Patient>();
+        patients.addAll(patientRepository.findAll(spec));
+        log.debug("query:{}, count:{}", query, patients.size());		
+        return patients;
+	}
+
+	@Override
+	public void deleteByHospitalId(Long id) {
+		String queryByHospitalId = "query=hospitalId:"+id;
+		List<Patient> patients = search(queryByHospitalId);
+		patientRepository.deleteAll(patients);		
 	}	
 
 }
